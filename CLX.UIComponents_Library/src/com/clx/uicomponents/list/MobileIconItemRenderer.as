@@ -7,11 +7,19 @@ package com.clx.uicomponents.list
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
+	import flash.events.TransformGestureEvent;
 	import flash.geom.Point;
+	import flash.ui.Multitouch;
+	import flash.ui.MultitouchInputMode;
 	import flash.utils.Timer;
 	
+	import mx.effects.Move;
+	import mx.effects.Parallel;
+	import mx.events.EffectEvent;
 	import mx.events.FlexEvent;
+	import mx.events.TouchInteractionEvent;
 	
+	import spark.components.Group;
 	import spark.components.IconItemRenderer;
 	
 	//*********************************************************************
@@ -39,6 +47,7 @@ package com.clx.uicomponents.list
 	
 	/**
 	 * IconItemRenderer for MobileList 
+	 * Swipe-Renderer: http://mobile.dzone.com/news/swipe-mobile-items-flex
 	 * @author dtie
 	 */
 	public class MobileIconItemRenderer extends IconItemRenderer implements IMobileItemRenderer
@@ -57,6 +66,12 @@ package com.clx.uicomponents.list
 		protected var _calloutTitleField:String = null;
 		protected var _calloutMessageFunction:Function = null;
 		protected var _calloutMessageField:String = null;
+		
+		// swipe
+		protected var FLAGSTATE:int = 0;
+		protected var _swipeGroup:Group;
+		protected var _swipeInEffect:Parallel = new Parallel(_swipeGroup);
+		protected var _swipeOutEffect:Parallel = new Parallel(_swipeGroup);
 
 		/* Wird nicht benötigt. Falls ein Event Listener registriert wird, wird das Icon/Decorator automatisch klickbar
 		protected var _iconClickable:Boolean = false;
@@ -81,9 +96,37 @@ package com.clx.uicomponents.list
 		}
 		
 		private function onCreationComplete(event:FlexEvent):void{
+			Multitouch.inputMode = MultitouchInputMode.GESTURE;
+			addEventListener(TransformGestureEvent.GESTURE_SWIPE, onSwipe);
+			parent.addEventListener(TouchInteractionEvent.TOUCH_INTERACTION_START, function(e:Event):void{
+				if (FLAGSTATE == 1)
+					_swipeOutEffect.play();
+			});
 
-/*			invalidateProperties();
-			validateNow();*/
+			
+			// Set up SwipeIn-Effect
+			if (_swipeGroup){
+				var moveIn:Move = new Move();
+				moveIn.xFrom = this.width;
+				moveIn.xTo = 0;
+				moveIn.duration = 150;
+				_swipeInEffect.addChild(moveIn);
+				_swipeInEffect.target = _swipeGroup;
+				
+				var moveOut:Move = new Move();
+				moveOut.xFrom = 0;
+				moveOut.xTo = this.width;
+				moveOut.duration = 150;
+				_swipeOutEffect.target = _swipeGroup;
+				_swipeOutEffect.addChild(moveOut);
+			}
+			
+			_swipeInEffect.addEventListener(EffectEvent.EFFECT_END, function(effectEvent:EffectEvent):void{
+				FLAGSTATE = 1;
+			});
+			_swipeOutEffect.addEventListener(EffectEvent.EFFECT_END, function(effectEvent:EffectEvent):void{
+				FLAGSTATE = 0;
+			});
 		}
 		
 /*		override public function set enabled(value:Boolean):void{
@@ -270,6 +313,28 @@ package com.clx.uicomponents.list
 			}
 		}
 		
+		/**
+		 * Swipe-Handler 
+		 * @param swipeEvent
+		 */
+		protected function onSwipe(swipeEvent:TransformGestureEvent):void{
+			this.parentDocument;
+			if(_swipeGroup){
+				if (FLAGSTATE == 0 && swipeEvent.offsetX == -1){
+					addChild(_swipeGroup);
+					_swipeGroup.width = this.width;
+					_swipeGroup.height = this.height;
+					_swipeGroup.visible = true;
+					_swipeInEffect.end();
+					_swipeInEffect.play();
+				}
+				else if(FLAGSTATE == 1 && swipeEvent.offsetX == 1){
+					_swipeOutEffect.end();
+					_swipeOutEffect.play();
+				}
+			}
+		}
+		
 		//------------------------------------
 		// Getter/Setter
 		//------------------------------------
@@ -319,5 +384,11 @@ package com.clx.uicomponents.list
 		}
 		*/
 
+		public function get swipeGroup():Group{
+			return _swipeGroup;
+		}
+		public function set swipeGroup(value:Group):void{
+			_swipeGroup = value;
+		}
 	}
 }

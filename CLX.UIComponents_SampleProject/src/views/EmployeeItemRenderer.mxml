@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<list:MobileIconItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							 xmlns:s="library://ns.adobe.com/flex/spark" 
+							 xmlns:list="com.clx.uicomponents.list.*"
+							 xmlns:views="views.*"
+							 >
+	<list:swipeGroup>
+		<s:Group>
+			<s:Rect width="100%" height="100%" top="0" left="0" right="0" bottom="0" >
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="#515151" alpha="0.9"/>
+						<s:GradientEntry color="#000101" alpha="0.9"/>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Rect>
+			<!--<s:BitmapImage width="100%" height="100%" source="@Embed('assets/pattern.png')" fillMode="repeat" />-->
+			<s:HGroup verticalAlign="middle" horizontalAlign="right" width="100%" height="100%" paddingRight="15">
+				<s:Button icon="@Embed('assets/icon1.png')" />
+				<s:Button icon="@Embed('assets/icon3.png')" />
+				<s:Button icon="@Embed('assets/icon2.png')"/>
+				<s:Button icon="@Embed('assets/icon4.png')" />
+				<s:Button label="Delete" chromeColor="#FF0000" color="#FFFFFF"/>
+			</s:HGroup>
+			<s:Label id="myTI" text="" bottom="3" horizontalCenter="0" backgroundColor="0x444444" color="0xFFFFFF"/>
+		</s:Group>
+	</list:swipeGroup>
+	
+</list:MobileIconItemRenderer>
