@@ -14,6 +14,7 @@
 
 package com.clx.uicomponents.list
 {
+	
 	import com.clx.uicomponents.list.callout.MobileListCallout;
 	import com.clx.uicomponents.list.event.MobileListCalloutEvent;
 	
@@ -23,11 +24,14 @@ package com.clx.uicomponents.list
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.FlexGlobals;
+	import mx.core.mx_internal;
 	import mx.events.PropertyChangeEvent;
 	
 	import spark.components.List;
 	import spark.events.IndexChangeEvent;
 	import spark.events.PopUpEvent;
+	
+	use namespace mx_internal;
 	
 	[Event(name="iconClicked", type="flash.events.Event")]
 	[Event(name="decoratorClicked", type="flash.events.Event")]
@@ -35,7 +39,8 @@ package com.clx.uicomponents.list
 	[Event(name="messageClicked", type="flash.events.Event")]
 	
 	/**
-	 * Enhanced list for use in mobile apps. Features a callout that can be opened for each list item 
+	 * Enhanced list for use in mobile apps. Features a callout that can be opened for each list item
+	 * http://flexponential.com/2009/12/20/disable-selection-on-some-items-in-a-spark-list/ 
 	 */
 	public class MobileList extends List
 	{
@@ -71,6 +76,51 @@ package com.clx.uicomponents.list
 			scroller.viewport.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, refreshCalloutProperties);
 		}
 		
+		override public function setSelectedIndex(value:int, dispatchChangeEvent:Boolean=false, changeCaret:Boolean=true):void{
+			if (value == selectedIndex)
+				return;
+			
+			if (value >= 0 && value < dataProvider.length){
+				var renderer:MobileIconItemRenderer = dataGroup.getElementAt(value) as MobileIconItemRenderer;
+				if (renderer.selectionEnabled != false){
+					
+					if (dispatchChangeEvent)
+						dispatchChangeAfterSelection = dispatchChangeEvent;
+					
+					_proposedSelectedIndex = value;
+					invalidateProperties();
+				}
+			} else {
+				if (dispatchChangeEvent)
+					dispatchChangeAfterSelection = dispatchChangeEvent;
+				
+				_proposedSelectedIndex = value;
+				invalidateProperties();
+			}
+		}
+		
+		override mx_internal function setSelectedIndices(value:Vector.<int>, dispatchChangeEvent:Boolean=false, changeCaret:Boolean=true):void
+		{
+			var newValue:Vector.<int> = new Vector.<int>;
+			// take out indices that are on items that have selectionEnabled=false
+			
+			for(var i:int = 0; i < value.length; i++)
+			{
+				
+				var item:* = dataProvider.getItemAt(value[i]);
+				
+				if (item.selectionEnabled == false)
+				{
+					continue;
+				}
+				
+				newValue.push(value[i]);
+			}
+			
+			super.setSelectedIndices(newValue, dispatchChangeEvent);
+		}
+		
+		
 		//------------------------------------
 		// Event handlers
 		//------------------------------------
@@ -80,10 +130,12 @@ package com.clx.uicomponents.list
 				var renderer:MobileIconItemRenderer = MobileIconItemRenderer(source);
 				//_preventSelection = source.iconClicked || source.decoratorClicked;
 				
+				if (renderer.STATE == MobileIconItemRenderer.OVERLAY_ACTIVE){
+					_preventSelection = true;
+				}
 				if (renderer.iconClickable && renderer.iconClicked){
 					renderer.iconClicked = false;
 					_preventSelection = true;
-					trace(hasEventListener(ICON_CLICKED));
 					dispatchEvent(new Event(ICON_CLICKED));
 				}
 				if (renderer.decoratorClickable && renderer.decoratorClicked){

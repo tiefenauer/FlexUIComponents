@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		initialize="onInitialize(event)"
+		>
+	
+	<fx:Metadata>
+		[HostComponent("com.clx.uicomponents.popup.AlertPopup")]
+	</fx:Metadata>
+	
+	<fx:Style>
+		.message
+		{
+			color: #FFFFFF;
+			textAlign: center;
+		}
+		.title
+		{
+			color: #FFFFFF;
+			textAlign: center;
+			fontWeight: bold;
+		}
+	</fx:Style>
+	
+	<fx:Declarations>
+		<s:MultiDPIBitmapSource id="icon_info" 
+								source120dpi="@Embed('com/clx/uicomponents/assets/dpi120/alert_ico_info.png')" 
+								source160dpi="@Embed('com/clx/uicomponents/assets/dpi160/alert_ico_info.png')"
+								source240dpi="@Embed('com/clx/uicomponents/assets/dpi240/alert_ico_info.png')"
+								source320dpi="@Embed('com/clx/uicomponents/assets/dpi320/alert_ico_info.png')"
+								source480dpi="@Embed('com/clx/uicomponents/assets/dpi480/alert_ico_info.png')"
+								source640dpi="@Embed('com/clx/uicomponents/assets/dpi640/alert_ico_info.png')"
+								/>
+		<s:MultiDPIBitmapSource id="icon_warning" 
+								source120dpi="@Embed('com/clx/uicomponents/assets/dpi120/alert_ico_warning.png')" 
+								source160dpi="@Embed('com/clx/uicomponents/assets/dpi160/alert_ico_warning.png')"
+								source240dpi="@Embed('com/clx/uicomponents/assets/dpi240/alert_ico_warning.png')"
+								source320dpi="@Embed('com/clx/uicomponents/assets/dpi320/alert_ico_warning.png')"
+								source480dpi="@Embed('com/clx/uicomponents/assets/dpi480/alert_ico_warning.png')"
+								source640dpi="@Embed('com/clx/uicomponents/assets/dpi640/alert_ico_warning.png')"
+								/>
+		<s:MultiDPIBitmapSource id="icon_error" 
+								source120dpi="@Embed('com/clx/uicomponents/assets/dpi120/alert_ico_error.png')" 
+								source160dpi="@Embed('com/clx/uicomponents/assets/dpi160/alert_ico_error.png')"
+								source240dpi="@Embed('com/clx/uicomponents/assets/dpi240/alert_ico_error.png')"
+								source320dpi="@Embed('com/clx/uicomponents/assets/dpi320/alert_ico_error.png')"
+								source480dpi="@Embed('com/clx/uicomponents/assets/dpi480/alert_ico_error.png')"
+								source640dpi="@Embed('com/clx/uicomponents/assets/dpi640/alert_ico_error.png')"
+								/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.clx.uicomponents.popup.AlertPopup;
+			
+			import mx.core.DPIClassification;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			
+			[Bindable] private var padding20:Number = 20;
+			
+			protected function onInitialize(event:FlexEvent):void{
+				switch (hostComponent.type){
+					case AlertPopup.INFO:
+						icon.source = icon_info;
+						setCurrentState('info');
+						break;
+					case AlertPopup.WARNING:
+						icon.source = icon_warning;
+						setCurrentState('warning');
+						break;
+					case AlertPopup.ERROR:
+						icon.source = icon_error;
+						setCurrentState('error');
+						break;
+				}
+				switch(FlexGlobals.topLevelApplication.applicationDPI){
+					case DPIClassification.DPI_160:
+						padding20 = 20;
+						break;
+					case DPIClassification.DPI_240:
+						padding20 = 30;
+						break;
+					case DPIClassification.DPI_320:
+						padding20 = 40;
+						break;
+					case DPIClassification.DPI_480:
+						padding20 = 60;
+						break;
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<!-- states -->
+	<s:states>
+		<s:State name="closed" />
+		<s:State name="disabled" />
+		<s:State name="normal" />
+		<s:State name="info" />
+		<s:State name="warning" />
+		<s:State name="error" />
+	</s:states>
+	
+	<!-- SkinParts
+	name=contentGroup, type=spark.components.Group, required=false
+	name=messageDisplay, type=spark.core.IDisplayText, required=false
+	name=titleDisplay, type=spark.core.IDisplayText, required=false
+	name=okButton, type=spark.components.Button, required=true
+	-->
+	
+	<!-- Background & Stroke -->
+	<s:Rect width="100%" height="100%" top="0" left="0" right="0" bottom="0" radiusX="10">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="#515151" alpha="0.9"/>
+				<s:GradientEntry color="#000101" alpha="0.9"/>
+			</s:LinearGradient>
+		</s:fill>
+		<s:stroke>
+			<s:LinearGradientStroke rotation="90">
+				<s:GradientEntry color="#bebebe"/>
+				<s:GradientEntry color="#000101" ratio="0.1"/>
+			</s:LinearGradientStroke>
+		</s:stroke>
+	</s:Rect>
+	
+	<s:VGroup width="100%"
+			  height="100%"
+			  paddingLeft="{padding20}"
+			  paddingRight="{padding20}"
+			  paddingTop="{padding20}"
+			  paddingBottom="{padding20}"
+			  gap="{padding20}"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  verticalCenter="0"
+			  >
+		
+		<s:HGroup width="100%" height="100%" >
+			<s:BitmapImage id="icon" />
+			
+			<s:Label id="titleDisplay"
+					 styleName="title"
+					 verticalAlign="middle"
+					 verticalCenter="0"
+					 includeInLayout="{hostComponent.title.length > 0}"
+					 visible="{hostComponent.title.length > 0}"
+					 width="100%"
+					 height="100%"
+					 />
+		</s:HGroup>
+		
+		<s:Label id="messageDisplay"
+				 styleName="message"
+				 includeInLayout="{hostComponent.message.length > 0}"
+				 visible="{hostComponent.message.length > 0}"
+				 width="100%"
+				 />
+		
+		<s:HGroup width="100%">
+			<s:Button id="okButton"
+					  bottom="0"
+					  width="100%"
+					  />
+			
+			<s:Button id="cancelButton"
+					  includeInLayout="{hostComponent.isCancelable}"
+					  bottom="0"
+					  width="100%"
+					  />	
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+</s:Skin>

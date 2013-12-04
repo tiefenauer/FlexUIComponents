@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		creationComplete="onCreationComplete(event)"
+		>
+	<fx:Style>
+		#percentDisplay
+		{
+			fontWeight: bold;
+			textAlign: center;
+			verticalAlign: middle;
+			color: #6E505A;
+		}
+		
+	</fx:Style>
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("spark.components.ProgressBar")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import mx.core.DPIClassification;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			
+			import spark.components.ProgressBar;
+			
+			protected function onCreationComplete(event:FlexEvent):void{
+				switch(FlexGlobals.topLevelApplication.applicationDPI){
+					case DPIClassification.DPI_160:
+						height = 20;
+						break;
+					case DPIClassification.DPI_240:
+						height = 30;
+						break;
+					case DPIClassification.DPI_320:
+						height = 40;
+						break;
+					case DPIClassification.DPI_480:
+						height = 60;
+						break;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<!-- SkinParts
+	name=percentDisplay, type=spark.core.IDisplayText, required=false
+	name=progressGroup, type=mx.core.IVisualElement, required=false
+	-->
+	
+	<s:Group id="contentGroup" 
+			 width="100%"
+			 height="100%"
+			 >
+		
+		<!-- Bar -->
+		<s:Rect radiusX="5"
+				radiusY="5"
+				width="100%"
+				height="100%"
+				>
+			<s:stroke>
+				<s:SolidColorStroke weight="1" color="#CCCCCC" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="#DBDBDB" />
+			</s:fill>
+		</s:Rect>
+		
+		<!-- Track -->
+		<s:Rect id="progressGroup" 
+				radiusX="5" 
+				radiusY="5"
+				height="100%"
+				>
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry id="startcolorEntry" color="#9FFC60"/>
+					<s:GradientEntry id="endColorEntry" color="#63B030"/>
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+		
+		<s:Label id="percentDisplay"
+				 width="100%"
+				 height="100%"
+				 />
+	</s:Group>
+</s:Skin>

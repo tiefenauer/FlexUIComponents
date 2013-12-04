@@ -1,0 +1,19 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace popup "com.clx.uicomponents.popup.*";
+@namespace ns "http://flex.apache.org/experimental/ns";
+
+popup|AlertPopup
+{
+	skinClass: ClassReference("com.clx.uicomponents.skins.DefaultAlertPopupSkin");
+}
+
+popup|ProgressPopup
+{
+	skinClass: ClassReference("com.clx.uicomponents.skins.DefaultProgressPopupSkin");
+}
+
+popup|IndefiniteProgressPopup
+{
+	skinClass: ClassReference("com.clx.uicomponents.skins.DefaultIndefiniteProgressPopupSkin");
+}

@@ -13,6 +13,7 @@ package com.clx.uicomponents.list
 	import flash.ui.MultitouchInputMode;
 	import flash.utils.Timer;
 	
+	import mx.core.mx_internal;
 	import mx.effects.Move;
 	import mx.effects.Parallel;
 	import mx.events.EffectEvent;
@@ -21,6 +22,10 @@ package com.clx.uicomponents.list
 	
 	import spark.components.Group;
 	import spark.components.IconItemRenderer;
+	
+	import avmplus.USE_ITRAITS;
+	
+	use namespace mx_internal;
 	
 	//*********************************************************************
 	// Styles
@@ -39,11 +44,11 @@ package com.clx.uicomponents.list
 	//*********************************************************************
 	[Event(name="iconClicked", type="flash.events.Event")]
 	[Event(name="decoratorClicked", type="flash.events.Event")]
-	/*
-	[Event(name="labelClicked", type="ch.igh.dataselect.mobile.core.view.component.list.event.MobileIconItemRendererEvent")]
-	[Event(name="messageClicked", type="ch.igh.dataselect.mobile.core.view.component.list.event.MobileIconItemRendererEvent")]
-	[Event(name="longTap", type="ch.igh.dataselect.mobile.core.view.component.list.event.MobileIconItemRendererEvent")]	
-	*/
+	[Event(name="labelClicked", type="flash.events.Event")]
+	[Event(name="messageClicked", type="flash.events.Event")]
+	[Event(name="longTap", type="flash.events.Event")]	
+	[Event(name="swipeLeft", type="flash.events.Event")]	
+	[Event(name="swipeRight", type="flash.events.Event")]	
 	
 	/**
 	 * IconItemRenderer for MobileList 
@@ -54,10 +59,20 @@ package com.clx.uicomponents.list
 	{
 		public static const NAME:String = 'MobileIconItemRenderer';
 		
+		[Bindable] public var selectionEnabled:Boolean = true;
+		
 		// event types
 		public static const ICON_CLICKED:String = 'iconClicked';
 		public static const DECORATOR_CLICKED:String = 'decoratorClicked';
+		public static const LABEL_CLICKED:String = 'labelClicked';
+		public static const MESSAGE_CLICKED:String = 'messageClicked';
+		public static const LONG_TAP:String = 'longTap';
+		public static const SWIPE_LEFT:String = 'swipeLeft';
+		public static const SWIPE_RIGHT:String = 'swipeRight';
 		
+		// swipe states
+		public static const OVERLAY_INACTIVE:Number = 0;
+		public static const OVERLAY_ACTIVE:Number = 1;
 		//------------------------------------
 		// Private/Protected variables
 		//------------------------------------
@@ -68,7 +83,7 @@ package com.clx.uicomponents.list
 		protected var _calloutMessageField:String = null;
 		
 		// swipe
-		protected var FLAGSTATE:int = 0;
+		public var STATE:int = 0;
 		protected var _swipeGroup:Group;
 		protected var _swipeInEffect:Parallel = new Parallel(_swipeGroup);
 		protected var _swipeOutEffect:Parallel = new Parallel(_swipeGroup);
@@ -95,13 +110,42 @@ package com.clx.uicomponents.list
 			addEventListener(FlexEvent.CREATION_COMPLETE, onCreationComplete);
 		}
 		
+		
+		/**
+		 * Hintergrund muss nicht geändert werden, wenn die Selektion deaktiviert ist 
+		 * @param unscaledWidth
+		 * @param unscaledHeight
+		 */
+		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void{
+			if (selectionEnabled){
+				super.drawBackground(unscaledWidth, unscaledHeight);
+			}
+			else{
+				var bgColor:uint = 0xffffff;
+				
+				graphics.clear();
+				
+				graphics.beginFill(bgColor,1);
+				graphics.lineStyle();
+				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+				graphics.endFill();
+				
+				// Draw the separator for the item renderer
+				super.drawBorder(unscaledWidth, unscaledHeight);
+				
+				opaqueBackground = bgColor;
+			}
+		}
+		
 		private function onCreationComplete(event:FlexEvent):void{
 			Multitouch.inputMode = MultitouchInputMode.GESTURE;
 			addEventListener(TransformGestureEvent.GESTURE_SWIPE, onSwipe);
-			parent.addEventListener(TouchInteractionEvent.TOUCH_INTERACTION_START, function(e:Event):void{
-				if (FLAGSTATE == 1)
-					_swipeOutEffect.play();
-			});
+			if(parent){
+				parent.addEventListener(TouchInteractionEvent.TOUCH_INTERACTION_START, function(e:Event):void{
+					if (STATE == 1)
+						_swipeOutEffect.play();
+				});
+			}
 
 			
 			// Set up SwipeIn-Effect
@@ -122,10 +166,10 @@ package com.clx.uicomponents.list
 			}
 			
 			_swipeInEffect.addEventListener(EffectEvent.EFFECT_END, function(effectEvent:EffectEvent):void{
-				FLAGSTATE = 1;
+				STATE = 1;
 			});
 			_swipeOutEffect.addEventListener(EffectEvent.EFFECT_END, function(effectEvent:EffectEvent):void{
-				FLAGSTATE = 0;
+				STATE = 0;
 			});
 		}
 		
@@ -158,9 +202,11 @@ package com.clx.uicomponents.list
 			switch (true){
 				case isLabelClicked(cp):
 					labelClicked = true;
+					dispatchEvent(new Event(LABEL_CLICKED));
 					break;
 				case isMessageClicked(cp):
 					messageClicked = true;
+					dispatchEvent(new Event(MESSAGE_CLICKED));
 					break;
 				case isIconClicked(cp):
 					iconClicked = true;
@@ -290,6 +336,7 @@ package com.clx.uicomponents.list
 			_touchTimer.reset();
 		}
 		private function onTouchTimer(event:TimerEvent):void {
+			dispatchEvent(new Event(LONG_TAP));
 			_touchTimer.stop();
 			_touchTimer.reset();
 			if(_showCallout){
@@ -318,9 +365,14 @@ package com.clx.uicomponents.list
 		 * @param swipeEvent
 		 */
 		protected function onSwipe(swipeEvent:TransformGestureEvent):void{
-			this.parentDocument;
+			if(swipeEvent.offsetX == -1)
+				dispatchEvent(new Event(SWIPE_LEFT));
+			else if (swipeEvent.offsetX == 1)
+				dispatchEvent(new Event(SWIPE_RIGHT));
+				
 			if(_swipeGroup){
-				if (FLAGSTATE == 0 && swipeEvent.offsetX == -1){
+				if (STATE == 0 && swipeEvent.offsetX == -1){
+					STATE = OVERLAY_ACTIVE;
 					addChild(_swipeGroup);
 					_swipeGroup.width = this.width;
 					_swipeGroup.height = this.height;
@@ -328,7 +380,8 @@ package com.clx.uicomponents.list
 					_swipeInEffect.end();
 					_swipeInEffect.play();
 				}
-				else if(FLAGSTATE == 1 && swipeEvent.offsetX == 1){
+				else if(STATE == 1 && swipeEvent.offsetX == 1){
+					STATE = OVERLAY_INACTIVE;
 					_swipeOutEffect.end();
 					_swipeOutEffect.play();
 				}
