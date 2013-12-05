@@ -17,6 +17,7 @@ package com.clx.uicomponents.skins
 	import com.clx.uicomponents.list.callout.element.MobileListCalloutArrow;
 	
 	import mx.core.DPIClassification;
+	import mx.states.SetStyle;
 	
 	import spark.skins.mobile.CalloutSkin;
 	
@@ -55,6 +56,7 @@ package com.clx.uicomponents.skins
 					break;
 				}
 			}
+			setStyle('color', 0xFFFFFF);
 		}
 		
 		override protected function createChildren():void {

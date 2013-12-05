@@ -18,6 +18,20 @@
 		{
 			skinClass: ClassReference("com.clx.uicomponents.skins.DefaultProgressBarSkin");
 		}
+		
+		.currentProgressLabel
+		{
+			color: #FFFFFF;
+			fontSize: 15;
+			textAlign: left;
+		}
+		.totalProgressLabel
+		{
+			color: #FFFFFF;
+			fontSize: 15;
+			textAlign: right;
+		}
+		
 	</fx:Style>
 	<!-- host component -->
 	<fx:Metadata>
@@ -109,6 +123,21 @@
 						currentProgress="0"
 						width="100%"
 						/>
+		
+		<s:HGroup width="100%" height="40">
+			<s:Label id="currentProgressLabel" 
+					 styleName="currentProgressLabel"
+					 includeInLayout="{hostComponent.currentProgress.length > 0}"
+					 visible="{hostComponent.currentProgress.length > 0}"
+					 width="50%" 
+					 />
+			<s:Label id="totalProgressLabel" 
+					 styleName="totalProgressLabel"
+					 includeInLayout="{hostComponent.totalProgress.length > 0}"
+					 visible="{hostComponent.totalProgress.length > 0}"
+					 width="50%" 
+					 />
+		</s:HGroup>
 		
 		<s:Button id="cancelButton"
 				  label="{hostComponent.cancelButtonLabel}"
