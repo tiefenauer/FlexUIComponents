@@ -2,6 +2,9 @@
 <flexLibProperties includeAllClasses="true" useMultiPlatformConfig="true" version="3">
   <includeClasses>
     <classEntry path="com.clx.uicomponents.popup.SimplePopup"/>
+    <classEntry path="com.clx.uicomponents.list.interfaces.IPullDownToRefreshGroup"/>
+    <classEntry path="com.clx.uicomponents.list.component.PullDownToRefreshGroup"/>
+    <classEntry path="com.clx.uicomponents.skins.DefaultPullDownToRefreshGroupSkin"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

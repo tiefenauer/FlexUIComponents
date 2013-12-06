@@ -17,14 +17,17 @@ package com.clx.uicomponents.list
 	
 	import com.clx.uicomponents.list.callout.MobileListCallout;
 	import com.clx.uicomponents.list.event.MobileListCalloutEvent;
+	import com.clx.uicomponents.list.interfaces.IPullDownToRefreshGroup;
 	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.FlexGlobals;
 	import mx.core.mx_internal;
+	import mx.effects.Move;
 	import mx.events.PropertyChangeEvent;
 	
 	import spark.components.List;
@@ -37,6 +40,9 @@ package com.clx.uicomponents.list
 	[Event(name="decoratorClicked", type="flash.events.Event")]
 	[Event(name="labelClicked", type="flash.events.Event")]
 	[Event(name="messageClicked", type="flash.events.Event")]
+	[Event(name="readyToRefreshStart", type="flash.events.Event")]
+	[Event(name="readyToRefreshStop", type="flash.events.Event")]
+	[Event(name="refreshing", type="flash.events.Event")]
 	
 	/**
 	 * Enhanced list for use in mobile apps. Features a callout that can be opened for each list item
@@ -52,6 +58,9 @@ package com.clx.uicomponents.list
 		public static const LABEL_CLICKED:String = "labelClicked";
 		public static const MESSAGE_CLICKED:String = "messageClicked";
 		public static const DECORATOR_CLICKED:String = "decoratorClicked";
+		public static const READY_TO_REFRESH_START:String = "readyToRefreshStart";
+		public static const READY_TO_REFRESH_STOP:String = "readyToRefreshStop";
+		public static const REFRESHING:String = "refreshing";
 
 		//------------------------------------
 		// Private/Protected variables
@@ -59,6 +68,9 @@ package com.clx.uicomponents.list
 		protected var _preventSelection:Boolean;
 		protected var _callout:MobileListCallout;
 		protected var _preventCalloutOpening:Boolean = false;
+		protected var _readyToRefresh:Boolean = false;
+		protected var _refreshing:Boolean = false;
+		protected var _pullDownToRefreshGroup:IPullDownToRefreshGroup;
 		
 		/**
 		 * Constructor 
@@ -66,6 +78,7 @@ package com.clx.uicomponents.list
 		public function MobileList(){
 			addEventListener(IndexChangeEvent.CHANGE, onChange);
 			addEventListener(IndexChangeEvent.CHANGING, onChanging);
+			addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		}
 		
 		override protected function createChildren():void{
@@ -74,6 +87,7 @@ package com.clx.uicomponents.list
 /*			addEventListener(ICON_CLICKED, onIconClicked);
 			addEventListener(DECORATOR_CLICKED, onDecoratorClicked);	*/		
 			scroller.viewport.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, refreshCalloutProperties);
+			dataGroup.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, onDataGroupPropertyChange);
 		}
 		
 		override public function setSelectedIndex(value:int, dispatchChangeEvent:Boolean=false, changeCaret:Boolean=true):void{
@@ -166,6 +180,38 @@ package com.clx.uicomponents.list
 			dispatchEvent(new MobileListEvent(MobileListEvent.DECORATOR_CLICKED, selectedItem));
 		}
 		*/
+		
+		/**
+		 * Zeige "Pull down to refresh" 
+		 * @param event
+		 */
+		protected function onDataGroupPropertyChange(event:PropertyChangeEvent):void{
+			if (!_refreshing && _pullDownToRefreshGroup && event.source == event.target && event.property == "verticalScrollPosition"){
+				var vScroll:Number = dataGroup.verticalScrollPosition;
+				_pullDownToRefreshGroup.height = vScroll* -1;
+				if(vScroll < _pullDownToRefreshGroup.minHeight * -1){
+					dispatchEvent(new Event(READY_TO_REFRESH_START));
+					readyToRefresh = true;
+				}
+				else if(!_refreshing){
+					dispatchEvent(new Event(READY_TO_REFRESH_STOP));
+				}
+			}
+		}
+		
+		protected function onMouseUp(event:MouseEvent):void{
+			if (_readyToRefresh){
+				refreshing = true;
+				dispatchEvent(new Event(REFRESHING));
+			}
+			else{
+				refreshing = false;
+			}
+		}
+		
+		//------------------------------------
+		// Private functions
+		//------------------------------------
 		private function openCallout(event:MobileListCalloutEvent):void{
 			if (!_preventCalloutOpening){
 				closeCallout();
@@ -240,6 +286,40 @@ package com.clx.uicomponents.list
 				ArrayCollection(dataProvider).refresh();
 			}
 			super.enabled = value;
+		}
+		public function get refreshing():Boolean{
+			return _refreshing;
+		}
+		public function set refreshing(value:Boolean):void{
+			if (value == _refreshing)
+				return;
+
+			_refreshing = value;
+			_pullDownToRefreshGroup.refreshing = value;
+			if (_refreshing && _pullDownToRefreshGroup){
+				_pullDownToRefreshGroup.refreshing = true;
+				this.y += _pullDownToRefreshGroup.height;
+			}
+			else if (!_refreshing && _pullDownToRefreshGroup){
+				var move:Move = new Move(this);
+				move.yFrom = this.y;
+				move.yTo = this.y -= _pullDownToRefreshGroup.height;
+				move.duration = 200;
+				move.play();
+				_readyToRefresh = false;
+			}
+		}
+		public function set readyToRefresh(value:Boolean):void{
+			_readyToRefresh = value;
+			if (_pullDownToRefreshGroup){
+				if (value) 
+					_pullDownToRefreshGroup.ready = true;
+				else 
+					_pullDownToRefreshGroup.ready = false;
+			}
+		}
+		public function set pullDownToRefreshGroup(value:IPullDownToRefreshGroup):void{
+			_pullDownToRefreshGroup = value;
 		}
 		
 	}

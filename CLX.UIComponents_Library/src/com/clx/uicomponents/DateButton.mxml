@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:popup="ch.clx.satellite.core.app.view.component.popup.*"
+		  initialize="onInitialize(event)"
+		  click="onClick(event)"
+		  width="100%"
+		  label="{_df.format(_date)}"
+		  >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			
+			//----------------------------------
+			// Private/Protected variables
+			//----------------------------------
+			[Bindable] protected var _date:Date = null;			
+			[Bindable] protected var _df:DateFormatter = new DateFormatter();
+			
+			private var _maxDate:Date = null;
+			
+			//----------------------------------
+			// Getter/Setter
+			//----------------------------------
+			public function get date():Date{
+				return _date;
+			}
+			public function set date(value:Date):void {
+				_date = value;
+			}
+			public function get maxDate():Date {
+				return _maxDate;
+			}
+			public function set maxDate(value:Date):void {
+				_maxDate = value;
+			}
+			
+			/**
+			 * Initialization
+			 */
+			protected function onInitialize(event:FlexEvent):void{
+				_df.formatString = 'DD.MM.YYYY';
+			}
+			/**
+			 * Button has been clicked
+			 */
+			protected function onClick(event:MouseEvent):void{
+			}
+			
+			
+		]]>
+	</fx:Script>
+</s:Button>

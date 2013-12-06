@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" xmlns:uicomponents="com.clx.uicomponents.*">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("com.clx.uicomponents.list.component.PullDownToRefreshGroup")]
+	</fx:Metadata>
+	
+	<!-- states -->
+	<s:states>
+		<s:State name="disabled" />
+		<s:State name="normal" />
+	</s:states>
+	
+	<!-- SkinParts
+	name=contentGroup, type=spark.components.Group, required=false
+	name=refreshLabel, type=spark.core.IDisplayText, required=true
+	-->
+	
+	<s:states>
+		<s:State name="waitingForRefresh" />
+		<s:State name="waitingForRelease" />
+		<s:State name="refreshing" />
+	</s:states>
+	
+	<!-- Background -->
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="#DDDDDD" ratio="0" />
+				<s:GradientEntry color="#FAFAFA" ratio="1" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<!-- Content -->
+	<s:HGroup horizontalAlign="center"
+			  paddingLeft="10" paddingTop="20" paddingBottom="10" paddingRight="10"
+			  width="100%" height="100%"
+			  >
+		<s:BusyIndicator id="refreshIndicator" 
+						 includeIn="refreshing"
+						 width="30" height="30" 
+						 />
+		<uicomponents:PanelMessageLabel id="refreshLabel" />
+	</s:HGroup>	
+</s:Skin>

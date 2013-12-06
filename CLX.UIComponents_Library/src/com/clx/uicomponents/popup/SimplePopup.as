@@ -54,7 +54,7 @@ package com.clx.uicomponents.popup
 		public function show():void{
 			try{
 				var parent:Application = FlexGlobals.topLevelApplication as Application;
-				if (parent){
+				if (parent.className != 'FlexUnitApplication'){
 					super.open(parent, true);
 					width = FlexGlobals.topLevelApplication.width * 0.8;
 					PopUpManager.centerPopUp(this);
