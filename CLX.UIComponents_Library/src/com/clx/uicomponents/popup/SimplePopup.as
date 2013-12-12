@@ -14,6 +14,8 @@
 
 package com.clx.uicomponents.popup
 {
+	import flash.system.System;
+	
 	import mx.core.FlexGlobals;
 	import mx.events.FlexEvent;
 	import mx.managers.PopUpManager;

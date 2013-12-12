@@ -28,7 +28,7 @@
 		<s:fill>
 			<s:LinearGradient rotation="90">
 				<s:GradientEntry color="#DDDDDD" ratio="0" />
-				<s:GradientEntry color="#FAFAFA" ratio="1" />
+				<s:GradientEntry color="#FFFFFF" ratio="1" />
 			</s:LinearGradient>
 		</s:fill>
 	</s:Rect>

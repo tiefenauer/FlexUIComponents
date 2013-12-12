@@ -194,6 +194,7 @@ package com.clx.uicomponents.list
 					readyToRefresh = true;
 				}
 				else if(!_refreshing){
+					_readyToRefresh = false;
 					dispatchEvent(new Event(READY_TO_REFRESH_STOP));
 				}
 			}

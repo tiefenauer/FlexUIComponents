@@ -166,6 +166,7 @@
 			
 			<s:Button id="cancelButton"
 					  includeInLayout="{hostComponent.isCancelable}"
+					  visible="{hostComponent.isCancelable}"
 					  bottom="0"
 					  width="100%"
 					  />	
