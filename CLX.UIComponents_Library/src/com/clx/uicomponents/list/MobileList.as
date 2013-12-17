@@ -96,7 +96,7 @@ package com.clx.uicomponents.list
 			
 			if (value >= 0 && value < dataProvider.length){
 				var renderer:MobileIconItemRenderer = dataGroup.getElementAt(value) as MobileIconItemRenderer;
-				if (renderer.selectionEnabled != false){
+				if (renderer.selectionEnabled){
 					
 					if (dispatchChangeEvent)
 						dispatchChangeAfterSelection = dispatchChangeEvent;
@@ -152,11 +152,13 @@ package com.clx.uicomponents.list
 					_preventSelection = true;
 					dispatchEvent(new Event(ICON_CLICKED));
 				}
-				if (renderer.decoratorClickable && renderer.decoratorClicked){
+				if (renderer.selectionEnabled && renderer.decoratorClickable && renderer.decoratorClicked){
 					renderer.decoratorClicked = false;
 					_preventSelection = true;
 					dispatchEvent(new Event(DECORATOR_CLICKED));
 				}
+				if (!renderer.selectionEnabled)
+					_preventSelection = true;
 			}
 		}
 		
